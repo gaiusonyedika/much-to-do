@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: much-to-do-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-ChangeMe123!}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-much-to-do}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  backend:
+    build: .
+    container_name: much-to-do-backend
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    envrionment:
+      PORT: 8080
+      MONGODB_URL: mogodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-ChangeMe123!}@mongodb:27017/${MONGO_INITDB_DATABASE:-much-to-do}?authSource=admin
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      inteval: 15s
+      timeout: 5s
+      retries: 5
+volumes:
+  mongo_data:

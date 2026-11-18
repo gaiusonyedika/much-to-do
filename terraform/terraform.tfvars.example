@@ -1,0 +1,9 @@
+# Copy to terraform.tfvars and fill in real values (never commit terraform.tfvars)
+aws_region  = "eu-west-1"
+enviroment  = "dev"
+vpc_cdir    = "10.0.0.0/16"
+key_name = "much-to-do-key"
+allowed_ssh_cidr = "0.0.0.0/0"
+mongodb_username = "admin"
+mongodb_password = "ChangeMe123!"
+mongodb_database = "much-to-do"
