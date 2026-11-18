@@ -36,3 +36,9 @@ docker-compose.test.yaml
 mongodb.key
 mongo-keyfile
 
+# Terraform - never commit state / local files
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+
