@@ -11,6 +11,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -23,15 +25,19 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-    envrionment:
+    environment:
       PORT: 8080
-      MONGODB_URL: mogodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-ChangeMe123!}@mongodb:27017/${MONGO_INITDB_DATABASE:-much-to-do}?authSource=admin
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-ChangeMe123!}@mongodb:27017/${MONGO_INITDB_DATABASE:-much-to-do}?authSource=admin
     ports:
       - "8080:8080"
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      inteval: 15s
+      interval: 15s
       timeout: 5s
       retries: 5
 volumes:
   mongo_data:
+networks:
+  app-network:

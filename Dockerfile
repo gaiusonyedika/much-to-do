@@ -1,0 +1,16 @@
+# Dockerfile - Go backend (much-to-do)
+# Go module lives in Server/
+FROM golang:1.22-alpine AS builder
+WORKDIR /app
+COPY Server/ ./Server/
+WORKDIR /app/Server
+RUN go mod download && CGO_ENABLED=0 GOOS=linux go build -o /app/server .
+FROM alpine:3.19
+RUN apk --no-cache add ca-certificates curl && adduser -D -u 10001 appuser
+WORKDIR /app
+COPY --from=builder /app/server .
+USER appuser
+ENV PORT=8080
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost:8080/health || exit 1
+CMD ["./server"]
